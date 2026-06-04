@@ -206,6 +206,16 @@ store/
 - Node.js 18+
 - npm
 
+## 部署（Vercel）
+
+线上示例：**https://vibe-music-nu.vercel.app**
+
+```bash
+npm run build   # 本地先通过
+```
+
+详见 [DEPLOY.md](./DEPLOY.md)（CLI 部署、GitHub 自动部署、自定义域名）。
+
 ---
 
 ## 已知限制
