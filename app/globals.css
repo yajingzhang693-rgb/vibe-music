@@ -3,25 +3,135 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --album-theme-color: #1db954;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@keyframes mesh-drift {
+  0% {
+    filter: hue-rotate(0deg);
+    transform: scale(1);
   }
+  100% {
+    filter: hue-rotate(8deg);
+    transform: scale(1.03);
+  }
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--album-theme-color, #1db954);
+}
+
+/* 打分页右侧控制区：极细滚动条，悬停/滚动时更明显 */
+.vibe-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.vibe-scrollbar:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+.vibe-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.vibe-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.vibe-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+
+.vibe-scrollbar:hover::-webkit-scrollbar-thumb,
+.vibe-scrollbar:focus-within::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.vibe-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* 曲目列表：限高滚动 + 主色细滚动条 + 底部渐隐 */
+.tracklist-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.tracklist-scroll:hover,
+.tracklist-scroll:focus-within {
+  scrollbar-color: color-mix(
+      in srgb,
+      var(--album-theme-color, #1db954) 55%,
+      transparent
+    )
+    transparent;
+}
+
+.tracklist-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.tracklist-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tracklist-scroll::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+
+.tracklist-scroll:hover::-webkit-scrollbar-thumb,
+.tracklist-scroll:focus-within::-webkit-scrollbar-thumb {
+  background: color-mix(
+    in srgb,
+    var(--album-theme-color, #1db954) 50%,
+    transparent
+  );
+}
+
+.tracklist-scroll::-webkit-scrollbar-thumb:hover {
+  background: color-mix(
+    in srgb,
+    var(--album-theme-color, #1db954) 75%,
+    transparent
+  );
+}
+
+.tracklist-fade-mask {
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 72%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 72%,
+    transparent 100%
+  );
+}
+
+.tracklist-bottom-vignette {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
 }
