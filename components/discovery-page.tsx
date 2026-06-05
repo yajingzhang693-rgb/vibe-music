@@ -13,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, KeyboardEvent } from "react";
+import { DiscoveryFooter } from "@/components/discovery-footer";
 import { motion } from "framer-motion";
 
 export function DiscoveryPage({
@@ -66,19 +67,19 @@ export function DiscoveryPage({
       style={{ backgroundColor: "#0a0a0a", color: "#ededed" }}
     >
       <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">
-        <header className="mb-12 flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-              Vibe Music
+        <header className="mb-12">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <h1 className="text-5xl font-bold leading-none tracking-tight">
+              Discurse
             </h1>
-            <p className="mt-2 text-zinc-400">发现 · 评分 · 分享</p>
+            <Link
+              href="/lists"
+              className="inline-flex shrink-0 items-center rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition hover:border-white/40 hover:bg-white/15"
+            >
+              我的榜单
+            </Link>
           </div>
-          <Link
-            href="/lists"
-            className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition hover:border-white/40 hover:bg-white/15"
-          >
-            我的榜单
-          </Link>
+          <p className="mt-2 text-white">发现 · 评分 · 分享</p>
         </header>
 
         <section className="mb-14">
@@ -188,6 +189,8 @@ export function DiscoveryPage({
             </div>
           )}
         </section>
+
+        <DiscoveryFooter />
       </div>
     </main>
   );

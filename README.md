@@ -1,22 +1,38 @@
 # Vibe Music Rating
 
-极简沉浸式音乐专辑评分与分享应用。用户可浏览精选专辑、搜索艺人、为专辑打分写评，并导出 12:16 竖版分享卡片 PNG。数据来自 Apple iTunes Search / Lookup API。
+极简沉浸式音乐专辑评分与分享 Web 应用（首页品牌名 **Discurse**）。浏览精选专辑、搜索艺人、为专辑打分写评、导出竖版分享卡，并创建 **10 / 20 / 30** 张容量的个人榜单与榜单分享卡。专辑元数据来自 Apple iTunes Search / Lookup API。
+
+**线上地址**：<https://vibe-music-nu.vercel.app>  
+**源码仓库**：<https://github.com/yajingzhang693-rgb/vibe-music>
+
+---
+
+## 项目进展（当前版本）
+
+| 模块 | 状态 |
+| --- | --- |
+| 发现页（Discurse 顶栏、编辑精选、底部 Marquee） | 已上线 |
+| 艺人页 / 专辑打分 | 已上线 |
+| 专辑分享卡（12:16）预览与 PNG 导出 | 已上线 |
+| 我的榜单（封面堆叠、行内重命名、拖拽排序） | 已上线 |
+| 榜单分享卡（10 / 20 / 30 三套排版） | 已上线 |
+| Vercel 生产部署 + GitHub `main` 自动构建 | 已打通 |
+| 用户数据云端同步 | 未实现（仅浏览器 localStorage） |
 
 ---
 
 ## 技术栈
 
-
-| 类别  | 选型                                       |
-| --- | ---------------------------------------- |
-| 框架  | Next.js 14（App Router）+ TypeScript       |
-| 样式  | Tailwind CSS                             |
-| 状态  | Zustand（打分数据）+ TanStack Query（iTunes 请求） |
-| 动画  | Framer Motion                            |
-| 取色  | fast-average-color（封面主色）                 |
-| 导出  | html-to-image（分享卡 PNG）                   |
-| 持久化 | localStorage                             |
-
+| 类别 | 选型 |
+| --- | --- |
+| 框架 | Next.js 14（App Router）+ TypeScript |
+| 样式 | Tailwind CSS |
+| 状态 | Zustand（打分）+ TanStack Query（iTunes） |
+| 榜单拖拽 | @dnd-kit |
+| 动画 | Framer Motion + CSS Marquee（`globals.css`） |
+| 取色 | fast-average-color（封面主色） |
+| 导出 | html-to-image（分享卡 PNG，`pixelRatio: 2`） |
+| 持久化 | 浏览器 localStorage（无后端数据库） |
 
 ---
 
@@ -27,9 +43,9 @@ npm install
 npm run dev
 ```
 
-浏览器打开终端显示的地址（一般为 [http://localhost:3000](http://localhost:3000)）。
+浏览器打开终端显示的地址（一般为 [http://localhost:3000](http://localhost:3000)；端口被占用时会自动改用 3001 等）。
 
-**若页面空白、500 或 chunk 找不到：**
+**若页面空白、500 或 `Cannot find module './xxx.js'`：**
 
 1. 只保留 **一个** `npm run dev` 终端。
 2. 清缓存后重启：
@@ -39,7 +55,7 @@ Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue
 npm run dev
 ```
 
-1. 浏览器 **Ctrl+F5** 硬刷新，确认端口与终端一致。
+3. 浏览器 **Ctrl+F5** 硬刷新，确认端口与终端一致。
 
 生产构建：
 
@@ -52,47 +68,64 @@ npm start
 
 ## 路由与页面
 
+| 路径 | 说明 |
+| --- | --- |
+| `/` | **发现页**：Discurse 顶栏、搜索、编辑精选、底部 TASTE, ARCHIVED 滚动横幅 |
+| `/artist/[artistId]` | **艺人页**：艺人信息 + 专辑列表（去重、过滤 EP） |
+| `/album/[collectionId]` | **打分页**：评分、乐评、试听、专辑分享卡 |
+| `/lists` | **我的榜单**：封面堆叠、新建 / 重命名 / 删除 |
+| `/lists/[listId]` | **榜单编辑**：拖拽排序、移除、分享卡预览与导出 |
+| `/api/itunes` | iTunes API 代理（`?forward=` 转发，带缓存） |
 
-| 路径                      | 说明                                 |
-| ----------------------- | ---------------------------------- |
-| `/`                     | **发现页**：8 张精选专辑网格 + 艺人搜索           |
-| `/artist/[artistId]`    | **艺人页**：艺人信息 + 专辑列表（去重、过滤 EP）      |
-| `/album/[collectionId]` | **打分交互页**：评分、乐评、曲目试听、分享卡预览与导出      |
-| `/lists`                | **我的榜单**：创建、查看、删除榜单列表              |
-| `/lists/[listId]`       | **榜单编辑**：重命名、拖拽排序、移除、榜单分享卡导出       |
-| `/api/itunes`           | iTunes API 代理（客户端经 `?forward=` 转发） |
+---
 
+## 数据存储说明
+
+所有用户数据保存在 **当前浏览器** 的 `localStorage` 中，**不会**上传到服务器。
+
+| 键名 | 内容 |
+| --- | --- |
+| `vibe-music-lists` | 榜单列表：`id`、`title`、`albumIds`、`capacity`（10/20/30）、`createdAt` |
+| `vibe-rating-{collectionId}` | 单张专辑的 overall / production / songwriting / review |
+
+**请注意：**
+
+- 换电脑、换浏览器、无痕模式或清除站点数据后，榜单与打分 **不会保留**。
+- `localhost` 与线上域名的 localStorage **相互独立**。
+- 榜单只存专辑 ID；封面与艺人名通过 iTunes API 按需拉取。
 
 ---
 
 ## 目录结构
 
 ```
-app/                    # App Router 页面与 API
-  page.tsx              # 发现页（服务端 prefetch 精选专辑）
+app/
+  page.tsx                    # 发现页（SSR 预取精选专辑）
   artist/[artistId]/
   album/[collectionId]/
-  api/itunes/route.ts   # iTunes 代理
+  lists/
+  lists/[listId]/
+  api/itunes/route.ts
 components/
-  discovery-page.tsx    # 发现页 UI
-  artist-page.tsx       # 艺人页 UI
-  album-rater-page.tsx  # 打分交互页（核心）
-  share-card.tsx        # 分享卡 DOM（预览 + 导出同源）
-  fluid-mesh-background.tsx
+  discovery-page.tsx          # 发现页 UI
+  discovery-footer.tsx        # 首页底部 Marquee + 页脚
+  artist-page.tsx
+  album-rater-page.tsx
+  share-card.tsx              # 专辑分享卡
+  list-share-card*.tsx        # 榜单分享卡（10 / 20 / 30）
+  lists-page.tsx
+  list-editor-page.tsx
+  list-capacity-picker.tsx
+  list-selector-popover.tsx
   export-card-button.tsx
-  preview-play-button.tsx
+  export-list-card-button.tsx
+  add-to-list-button.tsx
   album-cover.tsx
+  providers/
 hooks/
-  use-album-colors.ts   # 封面主色提取
-  use-track-preview.ts  # 试听播放（HTMLAudioElement）
 lib/
-  itunes.ts             # iTunes 请求、专辑过滤与去重
-  scoring.ts            # 总分公式
-  colors.ts             # 明度、对比色、Mesh 色板
-  constants.ts          # 精选 ID、分享卡尺寸、字数上限等
-  storage.ts            # localStorage 读写
+  list-share-layout.ts        # 榜单画布尺寸与预览缩放
 store/
-  use-rating-store.ts   # 打分 Zustand store
 ```
 
 ---
@@ -101,74 +134,65 @@ store/
 
 ### 发现页（`/`）
 
-- 展示 **8 张精选专辑**（`FEATURED_COLLECTION_IDS`，见 `lib/constants.ts`）。
-- 艺人搜索：输入后 Enter 或点击搜索，跳转艺人页。
-- 搜索框为 `type="text"`，无浏览器默认清除按钮。
-- 专辑封面 hover 时有主题色光晕与轻微缩放。
+**顶栏**
+
+- 主标题 **Discurse**（48px / `text-5xl`），与右侧「我的榜单」按钮 **垂直居中对齐**。
+- 副标题「发现 · 评分 · 分享」置于标题下方（白色）。
+- 「我的榜单」链至 `/lists`。
+
+**搜索**
+
+- 圆角胶囊搜索条 + 右侧圆形搜索按钮；Enter 或点击搜索展示艺人列表并跳转艺人页。
+
+**编辑精选**
+
+- **8 张**固定精选专辑（`FEATURED_COLLECTION_IDS`）。
+- 网格：默认 2 列，≥768px 为 4 列；封面 `rounded-xl`，hover 主题色光晕与轻微放大。
+- 封面右上角 **「+」** 可加入榜单；hover 显示专辑名与艺人。
+
+**底部页脚**（[`discovery-footer.tsx`](components/discovery-footer.tsx)）
+
+- **TASTE, ARCHIVED** 横向无限滚动横幅：`rounded-xl` 描边框，文案 + 白底箭头圆标重复排列；字号 `text-xl` / `md:text-2xl`，常规字重。
+- 双段 `ul` 无缝循环（`globals.css` 中 `discovery-marquee`，约 28s；`prefers-reduced-motion` 时停止动画）。
+- 页脚一行：© 2026 · Discurse · **Go all the way up**（平滑滚回顶部）。
 
 ### 艺人页（`/artist/[artistId]`）
 
-- 拉取艺人信息与专辑列表。
-- **专辑过滤**：仅 `collection` + `Album`，且 `trackCount > 7`（排除 EP）。
-- **去重**：按规范化标题合并 Deluxe / Expanded 等变体条目。
+- 仅 `collection` + `Album`，且 `trackCount > 7`（排除 EP）。
+- 按规范化标题去重 Deluxe / Expanded 等变体。
 
-### 打分交互页（`/album/[collectionId]`）
+### 打分页（`/album/[collectionId]`）
 
-**布局**
+- 左：分享卡预览（450px 宽）+「下载分享卡片」；右：评分、乐评、曲目列表。
+- 总分 = `整体 × 0.7 + ((制作 + 词曲) / 2) × 0.3`；乐评最多 **300 字**。
+- 数据键名 `vibe-rating-{collectionId}`。
 
-- 左侧：分享卡预览（450px 宽，12:16）+「下载分享卡片」毛玻璃按钮（间距 48px）。
-- 右侧：专辑信息、评分控件、乐评、曲目列表（独立滚动）。
-- 全页 **流体 Mesh 背景**（专辑主色 + Framer Motion 缓慢位移）。
-- 顶栏：「返回」毛玻璃按钮 + 试听播放按钮。
+### 我的榜单（`/lists`）
 
-**评分**
+- 新建时选择容量 **10张 / 20张 / 30张**（创建后不可改）。
+- 列表左侧 **封面堆叠**（前 3 张专辑；无专辑时音乐图标占位）。
+- 副文案 `n / 容量 张专辑 · x 张榜`（12px / `text-xs`）。
+- 行内重命名；hover 编辑 / 删除（删除带滑出动画）。
 
-- **整体分数（70%）**：数字输入框，滚轮 ±0.1、前导零清理、支持 `0.` 中间态、范围 0–10、最多一位小数。
-- **制作 Production（15%）**、**词曲 Songwriting（15%）**：滑块 0–10。
-- **最后总分** = `整体 × 0.7 + ((制作 + 词曲) / 2) × 0.3`，保留一位小数。
+### 榜单编辑（`/lists/[listId]`）
 
-**乐评**
+- 左：分享卡预览 +「导出榜单分享卡」；右：拖拽排序专辑列表。
+- 预览补占位、`showScores={false}`；导出仅已添加专辑。
 
-- 选填，最多 **300 字**，写入分享卡预览并随 PNG 导出。
+### 榜单分享卡（按容量）
 
-**试听联动**
+配置见 [`lib/list-share-layout.ts`](lib/list-share-layout.ts)，深色 Mesh 主题；卡片底栏水印仍为 **Vibe Music Rating**。
 
-- 右上角播放：播放曲目列表中第一首有 `previewUrl` 的歌。
-- 曲目列表可点击切换试听；无试听时 Toast「暂无试听」。
-- 播放时左侧分享卡下方 **环境光晕** 呼吸动画（opacity / blur / scale），不缩放卡片本体以免文字发糊。
+| 容量 | 布局 | 画布 | 导出 PNG（2×） | 编辑页预览宽 |
+| --- | --- | --- | --- | --- |
+| 10 张 | Top1 大卡 + 3×3（2–10） | 540×1060 | 1080×2120 | 400px |
+| 20 张 | 4×5，专名 + 艺人 + 可选分数 | 540×860 | 1080×1720 | 480px |
+| 30 张 | 5×6，专名 + 艺人 + 排名 | 540×880 | 1080×1760 | 480px |
 
-**持久化**
+### 专辑分享卡
 
-- 每张专辑评分存于 `localStorage`，键名 `vibe-rating-{collectionId}`。
-
-### 我的榜单（My Lists）
-
-- 榜单数据存于 `localStorage` 键名 `vibe-music-lists`；创建时选择容量 **10 / 20 / 30** 张（创建后不可改），同榜不重复。
-- **我的榜单**页：「新建我的榜单」→ 选容量 → 生成「未命名榜单」并进入行内重命名；列表卡片 hover 显示编辑/删除。
-- 发现页 / 艺人页 / 打分页 **「+」** → Popover 选已有榜或新建（同样需选 10/20/30）并加入。
-- 榜单分享卡（按容量三套排版，Vibe Mesh 深色主题）：
-  - **10 张**：Top1 大卡 + 3×3（2–10），画布 540×1060
-  - **20 张**：4×5，封面下专辑名 + 艺人 + 分数角标，画布 540×860
-  - **30 张**：5×6，封面 + 排名 + 专辑名 + 艺人，画布 540×880
-  - 仅渲染已添加专辑（不补空位）；导出 PNG 画布尺寸见上，**pixelRatio 均为 2**（如 20 张为 1080×1720）。
-
-### 分享卡（`components/share-card.tsx`）
-
-**画布**
-
-- DOM 尺寸：**540 × 720**（12:16）。
-- 导出 2×：**1080 × 1440** PNG。
-- 预览通过 CSS `scale` 缩至 **450px** 宽显示。
-
-**视觉**
-
-- 背景：封面铺满 + `blur(76px)` + 黑色遮罩（遮罩强度随制作/词曲滑块微调）。
-- 1px、30% 透明度白色描边。
-- 左上大封面（224×224）、右上大号分数、专辑名/艺人/乐评、底部水印。
-
-**导出**
-
-- `html-to-image` 对 `#share-card` 节点截图，文件名 `Vibe_Rating_{专辑名}.png`。
+- 画布 **540×720**（12:16），导出 **1080×1440**；预览宽 **450px**。
+- 文件名 `Vibe_Rating_{专辑名}.png`。
 
 ---
 
@@ -176,28 +200,54 @@ store/
 
 ```
 浏览器  →  /api/itunes?forward=...  →  itunes.apple.com
-服务端  →  直连 itunes.apple.com（prefetch 等）
+服务端  →  直连 itunes.apple.com（首页 prefetch 等）
 ```
 
-- 客户端请求带重试与 429 退避（`lib/itunes.ts`）。
-- 曲目列表：`lookup?id={collectionId}&entity=song`，使用 `previewUrl` 试听。
+- 客户端请求带重试与 429 退避；代理 `s-maxage=300`。
+- 曲目 `previewUrl` 用于 30 秒试听片段。
 
 ---
 
-## UI 规范（打分页）
+## 部署
 
-- 卡片/输入框等描边：**30% 透明度白色**（`border-white/30`）。
-- 布局分割线（顶栏底、左右栏分界）：**5%**（`border-white/5`），保持不变。
-- 下载/返回等按钮：**毛玻璃**（`bg-white/10` + `backdrop-blur-xl`），非专辑主色实心底。
-- 分享卡下载按钮文字：固定白色（不再随主色切换黑/白）。
+| 项 | 说明 |
+| --- | --- |
+| 平台 | Vercel，`npm run build`，**无需环境变量** |
+| 仓库 | [yajingzhang693-rgb/vibe-music](https://github.com/yajingzhang693-rgb/vibe-music) |
+| 触发 | 推送到 `main` 自动部署 |
+| 文档 | [DEPLOY.md](./DEPLOY.md) |
+
+```bash
+npm run build
+git push
+```
+
+---
+
+## 品牌与文案说明
+
+| 位置 | 文案 |
+| --- | --- |
+| 发现页顶栏 | **Discurse** |
+| 发现页 Marquee / 页脚中栏 | TASTE, ARCHIVED / **Discurse** |
+| 浏览器标签（`layout.tsx`） | Vibe Music Rating |
+| 专辑 / 榜单分享卡底栏 | Vibe Music Rating |
+
+---
+
+## UI 规范（全站深色）
+
+- 页面背景 `#0a0a0a`，正文 `#ededed`。
+- 字体：系统 UI 栈（`system-ui`, Segoe UI 等），无额外 Web Font。
+- 毛玻璃按钮：`bg-white/10` + `border-white/30` + `backdrop-blur-xl`。
+- 分享卡 / 列表卡片描边多为 `border-white/30`。
 
 ---
 
 ## 色彩工具（`lib/colors.ts`）
 
-- `relativeLuminance`：WCAG 相对明度。
-- `contrastTextForBackground`：深底白字 / 浅底黑字（用于需对比度适配的场景）。
-- `meshPaletteFromHex`：流体背景与 Mesh 渐变色板。
+- `meshPaletteFromHex`：流体背景与分享卡 Mesh 色板。
+- `relativeLuminance`、`contrastTextForBackground`：对比度适配。
 
 ---
 
@@ -206,21 +256,12 @@ store/
 - Node.js 18+
 - npm
 
-## 部署（Vercel）
-
-线上示例：**https://vibe-music-nu.vercel.app**
-
-```bash
-npm run build   # 本地先通过
-```
-
-详见 [DEPLOY.md](./DEPLOY.md)（CLI 部署、GitHub 自动部署、自定义域名）。
-
 ---
 
 ## 已知限制
 
-- 仅 iTunes 数据，无 Spotify。
-- 试听依赖 Apple 提供的 `previewUrl`，部分曲目可能无试听。
-- 开发模式下频繁热更新可能导致 `.next` 缓存损坏，需按上文步骤清理重启。
-
+- 仅 iTunes，无 Spotify。
+- 部分曲目无 `previewUrl`，无法试听。
+- 用户数据仅存 localStorage，**不跨设备同步**。
+- 开发模式热更新可能导致 `.next` 损坏，需删除 `.next` 后重启 `npm run dev`。
+- 国内访问 Vercel / Apple CDN 速度因网络而异。

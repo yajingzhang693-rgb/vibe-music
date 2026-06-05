@@ -20,21 +20,20 @@ npm run build
 npx vercel deploy --prod --yes
 ```
 
-## 方式 B：GitHub + Vercel 自动部署（推荐长期）
+## 方式 B：GitHub + Vercel 自动部署（已配置）
 
-1. 在 GitHub 新建空仓库（例如 `vibe-music`）。
-2. 本地推送（将 `<user>` / `<repo>` 换成你的）：
+- **仓库**：https://github.com/yajingzhang693-rgb/vibe-music
+- **`main` 分支 `git push` 后自动构建部署**
+
+若需在新环境克隆：
 
 ```powershell
-git remote add origin https://github.com/<user>/<repo>.git
-git push -u origin main
+git clone https://github.com/yajingzhang693-rgb/vibe-music.git
+cd vibe-music
+npm install
 ```
 
-3. 打开 [vercel.com](https://vercel.com) → **Add New → Project** → 导入该仓库。
-4. 保持默认：**Build** `npm run build`，**无需环境变量**。
-5. 之后每次 `git push` 到 `main` 会自动重新部署。
-
-若 CLI 已创建项目，可在 Vercel 项目 **Settings → Git** 中改为连接 GitHub 仓库。
+Vercel 项目 **Settings → Git** 应已连接上述仓库；构建命令 `npm run build`，无需环境变量。
 
 ## 自定义域名（可选）
 
