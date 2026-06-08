@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { GlobalToast } from "@/components/global-toast";
 import { AiAssistant } from "@/components/ai-assistant";
@@ -17,7 +19,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" className="dark">
+    <html
+      lang="zh-CN"
+      className={`dark bg-background ${GeistSans.variable} ${GeistMono.variable}`}
+    >
       <body
         className="min-h-screen bg-[#0a0a0a] font-sans text-[#ededed] antialiased"
         style={{ backgroundColor: "#0a0a0a", color: "#ededed" }}
