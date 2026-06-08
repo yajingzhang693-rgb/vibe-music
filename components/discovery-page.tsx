@@ -284,7 +284,7 @@ function HeroFloatingCards({
   ];
 
   return (
-    <div className="relative mt-16 h-[300px] md:h-[380px]">
+    <div className="relative mt-[30px] h-[300px] md:h-[380px]">
       {/* 彩色光束 */}
       <LightStreaks />
 
