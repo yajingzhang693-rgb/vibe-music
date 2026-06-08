@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { GlobalToast } from "@/components/global-toast";
+import { AiAssistant } from "@/components/ai-assistant";
 import { ListsHydrator } from "@/components/providers/lists-hydrator";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { MotionProvider } from "@/components/providers/motion-provider";
@@ -26,6 +27,7 @@ export default function RootLayout({
             <ListsHydrator />
             {children}
             <GlobalToast />
+            <AiAssistant />
           </MotionProvider>
         </QueryProvider>
       </body>

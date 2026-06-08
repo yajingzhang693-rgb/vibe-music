@@ -162,3 +162,111 @@ input[type="range"]::-webkit-slider-thumb {
     rgba(0, 0, 0, 0.55) 100%
   );
 }
+
+/* AI 写评：边框流光 + 按钮呼吸 */
+@keyframes ai-review-border-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ai-review-border-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.008);
+  }
+}
+
+@keyframes ai-review-btn-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 10px var(--review-accent-glow),
+      inset 0 0 12px var(--review-accent-secondary-glow);
+  }
+  50% {
+    box-shadow:
+      0 0 22px var(--review-accent-glow),
+      0 0 36px var(--review-accent-secondary-glow),
+      inset 0 0 18px var(--review-accent-secondary-glow);
+  }
+}
+
+@keyframes ai-review-btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ai-review-border-flow {
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-review-border-flow::before {
+  content: "";
+  position: absolute;
+  inset: -120%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    var(--review-accent, #1db954) 48deg,
+    var(--review-accent-secondary, #1db954) 96deg,
+    transparent 160deg,
+    var(--review-accent, #1db954) 220deg,
+    transparent 360deg
+  );
+  animation: ai-review-border-spin 2.8s linear infinite;
+}
+
+.ai-review-border-flow__pulse {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--review-accent, #1db954) 35%, transparent),
+    0 0 24px color-mix(in srgb, var(--review-accent, #1db954) 28%, transparent);
+  animation: ai-review-border-pulse 1.6s ease-in-out infinite;
+}
+
+.ai-review-border-flow__inner {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ai-review-btn-loading {
+  background: linear-gradient(
+    135deg,
+    var(--review-accent-soft),
+    var(--review-accent-secondary-soft),
+    var(--review-accent-soft)
+  );
+  background-size: 200% 200%;
+  animation:
+    ai-review-btn-breathe 1.8s ease-in-out infinite,
+    ai-review-gradient-shift 3s ease infinite;
+}
+
+@keyframes ai-review-gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.ai-review-btn-spinner {
+  animation: ai-review-btn-spin 0.75s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-review-border-flow::before,
+  .ai-review-border-flow__pulse,
+  .ai-review-btn-loading,
+  .ai-review-btn-spinner {
+    animation: none;
+  }
+}

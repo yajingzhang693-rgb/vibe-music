@@ -16,8 +16,10 @@
 | 专辑分享卡（12:16）预览与 PNG 导出 | 已上线 |
 | 我的榜单（封面堆叠、行内重命名、拖拽排序） | 已上线 |
 | 榜单分享卡（10 / 20 / 30 三套排版） | 已上线 |
+| 评分云端存储（Supabase） | 已实现 |
+| 右下角 AI 聊天助理 | 已实现 |
 | Vercel 生产部署 + GitHub `main` 自动构建 | 已打通 |
-| 用户数据云端同步 | 未实现（仅浏览器 localStorage） |
+| 榜单跨设备同步 | 未实现（仍仅 localStorage） |
 
 ---
 
@@ -27,12 +29,14 @@
 | --- | --- |
 | 框架 | Next.js 14（App Router）+ TypeScript |
 | 样式 | Tailwind CSS |
-| 状态 | Zustand（打分）+ TanStack Query（iTunes） |
+| 状态 | Zustand（打分、榜单）+ TanStack Query（iTunes） |
 | 榜单拖拽 | @dnd-kit |
 | 动画 | Framer Motion + CSS Marquee（`globals.css`） |
 | 取色 | fast-average-color（封面主色） |
 | 导出 | html-to-image（分享卡 PNG，`pixelRatio: 2`） |
-| 持久化 | 浏览器 localStorage（无后端数据库） |
+| 评分存储 | Supabase（`ratings` 表）+ localStorage 缓存 |
+| 榜单存储 | 浏览器 localStorage |
+| AI 对话 | Vercel AI SDK + DeepSeek API（`/api/chat`） |
 
 ---
 
@@ -40,6 +44,7 @@
 
 ```bash
 npm install
+cp .env.local.example .env.local   # 按需填写，见下方「环境变量」
 npm run dev
 ```
 
@@ -66,6 +71,22 @@ npm start
 
 ---
 
+## 环境变量
+
+复制 [`.env.local.example`](.env.local.example) 为 `.env.local` 后填写：
+
+| 变量 | 用途 | 是否必需 |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase 项目 URL | 评分同步 / AI 查分需要 |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase 匿名密钥 | 同上 |
+| `DEEPSEEK_API_KEY` | DeepSeek API 密钥 | AI 聊天助理需要 |
+
+未配置 Supabase 时，打分页会回退到 **仅 localStorage** 读写；未配置 DeepSeek 时，AI 助理不可用，其余功能正常。
+
+Supabase 需先在 SQL Editor 执行 [`supabase/ratings.sql`](supabase/ratings.sql) 建表。
+
+---
+
 ## 路由与页面
 
 | 路径 | 说明 |
@@ -76,21 +97,42 @@ npm start
 | `/lists` | **我的榜单**：封面堆叠、新建 / 重命名 / 删除 |
 | `/lists/[listId]` | **榜单编辑**：拖拽排序、移除、分享卡预览与导出 |
 | `/api/itunes` | iTunes API 代理（`?forward=` 转发，带缓存） |
+| `/api/chat` | AI 聊天接口（流式回复，可调用工具查用户评分） |
 
 ---
 
 ## 数据存储说明
 
-所有用户数据保存在 **当前浏览器** 的 `localStorage` 中，**不会**上传到服务器。
+### 匿名访客 ID
+
+- 键名：`discurse_visitor_id`（localStorage）
+- 首次访问时生成 UUID，作为 Supabase `ratings.user_id`
+- 无登录体系，同一浏览器内 ID 固定
+
+### 专辑评分
+
+| 存储 | 说明 |
+| --- | --- |
+| Supabase `ratings` 表 | 主数据源；字段含 `overall` / `production` / `songwriting` / `score` / `review` 及专辑元数据 |
+| `vibe-rating-{collectionId}` | 保存成功后的 localStorage 缓存，供榜单分享卡读取分数 |
+
+**打分页行为：**
+
+- 进入页面时，按 `visitorId + albumId` 从 Supabase 加载已有评分
+- 无记录时初始分数为 **0**（无默认分），按钮显示「保存评分」
+- 点击保存 / 更新后写入 Supabase，并同步 localStorage 缓存
+
+### 榜单
 
 | 键名 | 内容 |
 | --- | --- |
 | `vibe-music-lists` | 榜单列表：`id`、`title`、`albumIds`、`capacity`（10/20/30）、`createdAt` |
-| `vibe-rating-{collectionId}` | 单张专辑的 overall / production / songwriting / review |
+
+榜单 **仅存 localStorage**，不写入 Supabase。
 
 **请注意：**
 
-- 换电脑、换浏览器、无痕模式或清除站点数据后，榜单与打分 **不会保留**。
+- 换浏览器或清除站点数据后，`discurse_visitor_id` 会变，云端评分记录无法关联到新 ID。
 - `localhost` 与线上域名的 localStorage **相互独立**。
 - 榜单只存专辑 ID；封面与艺人名通过 iTunes API 按需拉取。
 
@@ -100,32 +142,39 @@ npm start
 
 ```
 app/
-  page.tsx                    # 发现页（SSR 预取精选专辑）
+  page.tsx
   artist/[artistId]/
   album/[collectionId]/
   lists/
   lists/[listId]/
   api/itunes/route.ts
+  api/chat/route.ts           # AI 聊天
 components/
-  discovery-page.tsx          # 发现页 UI
-  discovery-footer.tsx        # 首页底部 Marquee + 页脚
+  discovery-page.tsx
+  discovery-footer.tsx
   artist-page.tsx
   album-rater-page.tsx
-  share-card.tsx              # 专辑分享卡
-  list-share-card*.tsx        # 榜单分享卡（10 / 20 / 30）
+  ai-assistant.tsx            # 右下角聊天窗
+  share-card.tsx
+  list-share-card*.tsx
   lists-page.tsx
   list-editor-page.tsx
-  list-capacity-picker.tsx
-  list-selector-popover.tsx
-  export-card-button.tsx
-  export-list-card-button.tsx
-  add-to-list-button.tsx
-  album-cover.tsx
   providers/
 hooks/
+  useFingerprint.ts
 lib/
-  list-share-layout.ts        # 榜单画布尺寸与预览缩放
+  fingerprint.ts
+  supabase.ts
+  ratings-sync.ts             # 评分读写 Supabase
+  ratings-query.ts            # 按用户查评分（供 AI 工具）
+  deepseek.ts
+  list-share-layout.ts
+  storage.ts
 store/
+  use-rating-store.ts
+  use-lists-store.ts
+supabase/
+  ratings.sql                 # 建表 SQL
 ```
 
 ---
@@ -165,7 +214,16 @@ store/
 
 - 左：分享卡预览（450px 宽）+「下载分享卡片」；右：评分、乐评、曲目列表。
 - 总分 = `整体 × 0.7 + ((制作 + 词曲) / 2) × 0.3`；乐评最多 **300 字**。
-- 数据键名 `vibe-rating-{collectionId}`。
+- 加载时从 Supabase 读取；无记录时分数初始为 0。
+- 显式「保存评分 / 更新评分」按钮，保存成功后 Toast 提示。
+
+### AI 聊天助理
+
+- 全站右下角悬浮按钮，展开为毛玻璃风格聊天窗。
+- 后端 [`/api/chat`](app/api/chat/route.ts) 调用 DeepSeek，流式输出回复。
+- 内置工具 `get_my_top_albums`：按当前 `visitorId` 从 Supabase 查询用户评分，支持 `genre`、`limit` 参数。
+- 查询结果 ≥ 2 张专辑时，聊天窗内可显示「一键生成榜单」，调用现有榜单 store 创建并跳转编辑页。
+- 需配置 `DEEPSEEK_API_KEY`；用户须先在打分页保存过评分，助理才能查到数据。
 
 ### 我的榜单（`/lists`）
 
@@ -212,10 +270,17 @@ store/
 
 | 项 | 说明 |
 | --- | --- |
-| 平台 | Vercel，`npm run build`，**无需环境变量** |
+| 平台 | Vercel，`npm run build` |
 | 仓库 | [yajingzhang693-rgb/vibe-music](https://github.com/yajingzhang693-rgb/vibe-music) |
 | 触发 | 推送到 `main` 自动部署 |
 | 文档 | [DEPLOY.md](./DEPLOY.md) |
+
+**环境变量（Vercel → Settings → Environment Variables）：**
+
+- 评分同步：`NEXT_PUBLIC_SUPABASE_URL`、`NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- AI 助理：`DEEPSEEK_API_KEY`
+
+未配置时，应用仍可部署运行，对应功能降级或不可用。
 
 ```bash
 npm run build
@@ -262,6 +327,8 @@ git push
 
 - 仅 iTunes，无 Spotify。
 - 部分曲目无 `previewUrl`，无法试听。
-- 用户数据仅存 localStorage，**不跨设备同步**。
+- 无用户登录；访客 ID 存 localStorage，换浏览器后云端评分无法自动关联。
+- 榜单仅存 localStorage，不跨设备同步。
+- AI 助理依赖 DeepSeek API，需自行配置密钥；只能读取当前访客 ID 下的评分。
 - 开发模式热更新可能导致 `.next` 损坏，需删除 `.next` 后重启 `npm run dev`。
-- 国内访问 Vercel / Apple CDN 速度因网络而异。
+- 国内访问 Vercel / Apple CDN / DeepSeek API 速度因网络而异。

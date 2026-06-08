@@ -4,7 +4,7 @@ export const FEATURED_COLLECTION_IDS = [
   1630005298, // Beyoncé — RENAISSANCE
   1669095245, // Caroline Polachek — Desire, I Want to Turn Into You
   1564530719, // Clairo — Happier Than Ever
-  1781316864, // Kendrick Lamar — GNX
+  1806614239, // PinkPantheress — Fancy That
   1665311474, // Kali Uchis — Red Moon In Venus
   1739079974, // Charli XCX — BRAT
   1751414757, // Magdalena Bay — Imaginal Disk

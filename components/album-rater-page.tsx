@@ -2,18 +2,20 @@
 
 import {
   getShareCardPreviewMetrics,
-  MAX_REVIEW_LENGTH,
   PREVIEW_DISPLAY_WIDTH,
   SHARE_CARD_HEIGHT,
   SHARE_CARD_WIDTH,
 } from "@/lib/constants";
 import { hdArtworkUrl } from "@/lib/artwork";
+import { fetchGeneratedReview } from "@/lib/generate-review";
+import { AiReviewField } from "@/components/ai-review-field";
 import { lookupAlbum, lookupSongs } from "@/lib/itunes";
 import { useAlbumColors } from "@/hooks/use-album-colors";
 import { useTrackPreview } from "@/hooks/use-track-preview";
 import { PreviewPlayButton } from "@/components/preview-play-button";
 import { AddToListButton } from "@/components/add-to-list-button";
 import { useRatingStore } from "@/store/use-rating-store";
+import { useToastStore } from "@/store/use-toast-store";
 import { ShareCard } from "@/components/share-card";
 import { ExportCardButton } from "@/components/export-card-button";
 import { AlbumCover } from "@/components/album-cover";
@@ -97,27 +99,46 @@ export function AlbumRaterPage({
   });
 
   const {
-    hydrate,
+    loadRating,
+    saveRating,
     overall,
     production,
     songwriting,
     review,
     finalScore,
     themeColor,
+    hasExistingRating,
+    isLoadingRating,
+    isSaving,
     setOverall,
     setProduction,
     setSongwriting,
     setReview,
     setThemeColor,
+    setAlbumMeta,
   } = useRatingStore();
+
+  const showToast = useToastStore((s) => s.show);
 
   const album = albumQuery.data;
   const artwork = hdArtworkUrl(album?.artworkUrl100);
   const { color } = useAlbumColors(artwork);
 
   useEffect(() => {
-    hydrate(collectionId);
-  }, [collectionId, hydrate]);
+    if (!album) return;
+
+    setAlbumMeta({
+      albumId: collectionId,
+      albumName: album.collectionName ?? "",
+      artistName: album.artistName ?? "",
+      genre: album.primaryGenreName ?? "",
+      releaseDate: album.releaseDate ?? "",
+    });
+
+    void loadRating(collectionId).then((result) => {
+      if (result === "error") showToast("加载评分失败");
+    });
+  }, [album, collectionId, setAlbumMeta, loadRating, showToast]);
 
   useEffect(() => {
     if (color) setThemeColor(color);
@@ -188,6 +209,13 @@ export function AlbumRaterPage({
       </main>
     );
   }
+
+  const handleSaveRating = async () => {
+    console.log("[handleSaveRating] 用户点击保存按钮");
+    const ok = await saveRating();
+    console.log("[handleSaveRating] 保存结果:", ok);
+    showToast(ok ? "评分已保存" : "保存失败，请重试");
+  };
 
   const name = album.collectionName ?? "专辑";
   const artist = album.artistName ?? "";
@@ -270,57 +298,91 @@ export function AlbumRaterPage({
               <AddToListButton collectionId={collectionId} />
             </section>
 
-            <div className="rounded-xl border border-white/30 bg-white/5 p-4 backdrop-blur-md">
-              <p className="text-xs uppercase tracking-widest text-zinc-500">
-                最后总分
-              </p>
-              <motion.p
-                key={finalScore}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 280, damping: 22 }}
-                className="mt-1 text-4xl font-bold tabular-nums text-white"
-              >
-                {finalScore.toFixed(1)}
-              </motion.p>
-            </div>
+            {isLoadingRating ? (
+              <div className="space-y-8">
+                <Skeleton className="h-24 w-full rounded-xl" />
+                <Skeleton className="h-16 w-full rounded-xl" />
+                <Skeleton className="h-16 w-full rounded-xl" />
+                <Skeleton className="h-16 w-full rounded-xl" />
+                <Skeleton className="h-32 w-full rounded-xl" />
+              </div>
+            ) : (
+              <>
+                <div className="rounded-xl border border-white/30 bg-white/5 p-4 backdrop-blur-md">
+                  <p className="text-xs uppercase tracking-widest text-zinc-500">
+                    最后总分
+                  </p>
+                  <motion.p
+                    key={finalScore}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ type: "spring", stiffness: 280, damping: 22 }}
+                    className="mt-1 text-4xl font-bold tabular-nums text-white"
+                  >
+                    {finalScore.toFixed(1)}
+                  </motion.p>
+                </div>
 
-            <ScoreField
-              label="整体分数 (70%)"
-              value={overall}
-              onChange={setOverall}
-            />
+                <ScoreField
+                  label="整体分数 (70%)"
+                  value={overall}
+                  onChange={setOverall}
+                />
 
-            <SliderField
-              label="制作 Production (15%)"
-              value={production}
-              onChange={setProduction}
-              color={themeColor}
-            />
+                <SliderField
+                  label="制作 Production (15%)"
+                  value={production}
+                  onChange={setProduction}
+                  color={themeColor}
+                />
 
-            <SliderField
-              label="词曲 Songwriting (15%)"
-              value={songwriting}
-              onChange={setSongwriting}
-              color={themeColor}
-            />
+                <SliderField
+                  label="词曲 Songwriting (15%)"
+                  value={songwriting}
+                  onChange={setSongwriting}
+                  color={themeColor}
+                />
 
-            <div>
-              <label className="mb-2 block text-sm text-zinc-400">
-                乐评（选填，{MAX_REVIEW_LENGTH} 字内）
-              </label>
-              <textarea
-                value={review}
-                onChange={(e) => setReview(e.target.value)}
-                maxLength={MAX_REVIEW_LENGTH}
-                rows={4}
-                placeholder="写下你对这张专辑的感受…"
-                className="w-full resize-none rounded-xl border border-white/30 bg-white/5 p-4 text-sm backdrop-blur-md outline-none focus:border-white/30"
-              />
-              <p className="mt-1 text-right text-xs text-zinc-500">
-                {review.length}/{MAX_REVIEW_LENGTH}
-              </p>
-            </div>
+                <AiReviewField
+                  review={review}
+                  onReviewChange={setReview}
+                  themeColor={themeColor}
+                  disabled={isLoadingRating || isSaving}
+                  onGenerate={(keywords) =>
+                    fetchGeneratedReview({
+                      album: {
+                        albumName: name,
+                        artistName: artist,
+                        genre: album.primaryGenreName ?? "",
+                        releaseDate: album.releaseDate,
+                      },
+                      scores: {
+                        overall,
+                        production,
+                        songwriting,
+                        finalScore,
+                      },
+                      keywords: keywords || undefined,
+                    })
+                  }
+                  onSuccess={() => showToast("乐评已生成")}
+                  onError={(message) => showToast(message)}
+                />
+
+                <button
+                  type="button"
+                  disabled={isSaving || isLoadingRating}
+                  onClick={() => void handleSaveRating()}
+                  className="w-full rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-medium text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition hover:border-white/40 hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isSaving
+                    ? "保存中…"
+                    : hasExistingRating
+                      ? "更新评分"
+                      : "保存评分"}
+                </button>
+              </>
+            )}
 
             <TracklistSection
               tracksQuery={tracksQuery}

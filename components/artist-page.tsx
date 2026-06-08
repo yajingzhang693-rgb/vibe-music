@@ -32,7 +32,13 @@ export function ArtistPage({ artistId }: { artistId: string }) {
   const [bgFailed, setBgFailed] = useState(false);
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white">
+    <main className="relative min-h-screen bg-[#0a0a0a] text-white">
+      <Link
+        href="/"
+        className="absolute left-4 top-8 z-20 inline-flex items-center rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition hover:border-white/40 hover:bg-white/15 lg:left-6"
+      >
+        发现
+      </Link>
       <div className="flex min-h-screen flex-col lg:flex-row">
         <aside className="relative h-64 shrink-0 lg:sticky lg:top-0 lg:h-screen lg:w-[42%]">
           {bgUrl && !bgFailed ? (
@@ -55,12 +61,6 @@ export function ArtistPage({ artistId }: { artistId: string }) {
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent backdrop-blur-[2px] lg:bg-gradient-to-r" />
           <div className="absolute bottom-6 left-6 right-6">
-            <Link
-              href="/"
-              className="mb-4 inline-block text-xs text-zinc-400 hover:text-white"
-            >
-              ← 发现
-            </Link>
             <h1 className="text-4xl font-bold md:text-5xl lg:text-6xl">
               {artistName}
             </h1>
