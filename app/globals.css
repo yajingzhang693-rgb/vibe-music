@@ -5,13 +5,42 @@
 :root {
   --background: #0a0a0a;
   --foreground: #ededed;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-elevated: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.1);
+  --muted: #8a8a8f;
+  --accent: #f0f0f2;
+  --radius: 0.875rem;
   --album-theme-color: #1db954;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 精致大标题：紧凑字距 + 平衡换行 */
+.display-title {
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+}
+
+/* 极细分隔线（顶部高光感） */
+.hairline {
+  border-top: 1px solid var(--border);
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.03);
+}
+
+/* 毛玻璃面板基底 */
+.glass-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
 }
 
 @keyframes discovery-marquee {

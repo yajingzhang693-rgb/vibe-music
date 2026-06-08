@@ -32,8 +32,22 @@ function BackButton() {
   return (
     <Link
       href="/"
-      className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition hover:border-white/40 hover:bg-white/15"
+      className="glass-panel inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-foreground shadow-soft transition-all hover:scale-[1.03] hover:border-white/25 active:scale-95"
     >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+      >
+        <path d="m15 18-6-6 6-6" />
+      </svg>
       返回
     </Link>
   );
@@ -211,9 +225,7 @@ export function AlbumRaterPage({
   }
 
   const handleSaveRating = async () => {
-    console.log("[handleSaveRating] 用户点击保存按钮");
     const ok = await saveRating();
-    console.log("[handleSaveRating] 保存结果:", ok);
     showToast(ok ? "评分已保存" : "保存失败，请重试");
   };
 
@@ -226,7 +238,7 @@ export function AlbumRaterPage({
       style={pageStyle}
     >
       <FluidMeshBackground color={themeColor} />
-      <header className="relative z-10 flex shrink-0 items-center justify-between border-b border-white/5 px-8 py-5">
+      <header className="relative z-10 flex shrink-0 items-center justify-between border-b border-border px-8 py-5">
         <BackButton />
         <PreviewPlayButton
           isPlaying={isPlaying}
@@ -237,7 +249,7 @@ export function AlbumRaterPage({
 
       <div className="relative z-10 flex min-h-0 flex-1 flex-col lg:flex-row">
         {/* 左侧预览：顶部与右侧专辑信息对齐，不随右侧滚动 */}
-        <aside className="flex min-h-0 shrink-0 items-start justify-center border-b border-white/5 px-6 py-8 lg:w-[46%] lg:border-b-0 lg:border-r lg:px-8">
+        <aside className="flex min-h-0 shrink-0 items-start justify-center border-b border-border px-6 py-8 lg:w-[46%] lg:border-b-0 lg:border-r lg:px-8">
           <div
             className="flex flex-col items-stretch gap-12"
             style={{ width: preview.displayWidth }}
@@ -287,13 +299,15 @@ export function AlbumRaterPage({
                 collectionId={collectionId}
                 src={album.artworkUrl100}
                 alt={name}
-                className="h-24 w-24 shrink-0 rounded-lg"
+                className="h-24 w-24 shrink-0 rounded-xl shadow-soft"
                 size={96}
                 sharedLayout={false}
               />
               <div className="min-w-0 flex-1">
-                <h1 className="text-2xl font-bold leading-tight">{name}</h1>
-                <p className="mt-1 text-base text-zinc-400">{artist}</p>
+                <h1 className="display-title text-balance text-2xl font-semibold leading-tight md:text-3xl">
+                  {name}
+                </h1>
+                <p className="mt-1.5 text-base text-muted">{artist}</p>
               </div>
               <AddToListButton collectionId={collectionId} />
             </section>
@@ -308,8 +322,8 @@ export function AlbumRaterPage({
               </div>
             ) : (
               <>
-                <div className="rounded-xl border border-white/30 bg-white/5 p-4 backdrop-blur-md">
-                  <p className="text-xs uppercase tracking-widest text-zinc-500">
+                <div className="glass-panel rounded-2xl p-5 shadow-soft">
+                  <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
                     最后总分
                   </p>
                   <motion.p
@@ -317,7 +331,7 @@ export function AlbumRaterPage({
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ type: "spring", stiffness: 280, damping: 22 }}
-                    className="mt-1 text-4xl font-bold tabular-nums text-white"
+                    className="mt-1.5 text-5xl font-semibold tabular-nums text-foreground"
                   >
                     {finalScore.toFixed(1)}
                   </motion.p>
@@ -373,7 +387,7 @@ export function AlbumRaterPage({
                   type="button"
                   disabled={isSaving || isLoadingRating}
                   onClick={() => void handleSaveRating()}
-                  className="w-full rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-medium text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition hover:border-white/40 hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-full bg-foreground px-6 py-3.5 text-sm font-medium text-background shadow-soft-lg transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
                 >
                   {isSaving
                     ? "保存中…"
@@ -398,7 +412,7 @@ export function AlbumRaterPage({
 }
 
 const TRACKLIST_GLASS =
-  "relative overflow-hidden rounded-xl border border-white/30 bg-white/5 backdrop-blur-md";
+  "glass-panel relative overflow-hidden rounded-2xl shadow-soft";
 
 const TRACKLIST_SCROLL =
   "tracklist-scroll tracklist-fade-mask max-h-[300px] list-none overflow-y-auto overscroll-contain";
@@ -416,7 +430,9 @@ function TracklistSection({
 }) {
   return (
     <section>
-      <h3 className="mb-2 text-sm font-medium text-zinc-400">曲目列表</h3>
+      <h3 className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-muted">
+        曲目列表
+      </h3>
 
       <div className={TRACKLIST_GLASS}>
         {tracksQuery.isLoading && (
@@ -448,14 +464,14 @@ function TracklistSection({
                     <button
                       type="button"
                       onClick={() => onTrackClick(t)}
-                      className={`w-full rounded-md px-2 py-1.5 text-left text-sm leading-snug text-white transition hover:bg-white/10 ${
-                        isActive ? "bg-white/10" : ""
+                      className={`w-full rounded-lg px-2.5 py-2 text-left text-sm leading-snug text-foreground transition-colors hover:bg-white/[0.06] ${
+                        isActive ? "bg-white/[0.08]" : ""
                       }`}
                     >
-                      <span className={isActive ? "text-white" : ""}>
+                      <span className={isActive ? "text-foreground" : ""}>
                         {i + 1}. {t.trackName}
                         {isActive && (
-                          <span className="ml-2 text-xs text-zinc-400">
+                          <span className="ml-2 text-xs text-muted">
                             试听中
                           </span>
                         )}
@@ -589,7 +605,7 @@ function ScoreField({
 
   return (
     <div ref={containerRef}>
-      <label className="mb-2 block text-sm text-zinc-400">{label}</label>
+      <label className="mb-2 block text-sm text-muted">{label}</label>
       <input
         type="text"
         inputMode="decimal"
@@ -600,7 +616,7 @@ function ScoreField({
         }}
         onBlur={handleBlur}
         onChange={handleChange}
-        className="w-full rounded-xl border border-white/30 bg-white/5 px-4 py-3 text-2xl font-bold tabular-nums text-white backdrop-blur-md outline-none focus:border-white/30 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="glass-panel w-full rounded-xl px-4 py-3 text-2xl font-semibold tabular-nums text-foreground outline-none transition-colors focus:border-white/25 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
     </div>
   );
@@ -620,8 +636,8 @@ function SliderField({
   return (
     <div>
       <div className="mb-2 flex justify-between text-sm">
-        <span className="text-zinc-400">{label}</span>
-        <span className="tabular-nums text-zinc-300">{value.toFixed(1)}</span>
+        <span className="text-muted">{label}</span>
+        <span className="tabular-nums text-foreground">{value.toFixed(1)}</span>
       </div>
       <input
         type="range"

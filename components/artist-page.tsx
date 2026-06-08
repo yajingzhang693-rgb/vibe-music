@@ -32,12 +32,26 @@ export function ArtistPage({ artistId }: { artistId: string }) {
   const [bgFailed, setBgFailed] = useState(false);
 
   return (
-    <main className="relative min-h-screen bg-[#0a0a0a] text-white">
+    <main className="relative min-h-screen bg-[#0a0a0a] text-foreground">
       <Link
         href="/"
-        className="absolute left-4 top-8 z-20 inline-flex items-center rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition hover:border-white/40 hover:bg-white/15 lg:left-6"
+        className="glass-panel fixed left-4 top-8 z-20 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-foreground shadow-soft transition-all hover:scale-[1.03] hover:border-white/25 active:scale-95 lg:left-6"
       >
-        发现
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+        返回
       </Link>
       <div className="flex min-h-screen flex-col lg:flex-row">
         <aside className="relative h-64 shrink-0 lg:sticky lg:top-0 lg:h-screen lg:w-[42%]">
@@ -59,16 +73,19 @@ export function ArtistPage({ artistId }: { artistId: string }) {
               }}
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent backdrop-blur-[2px] lg:bg-gradient-to-r" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent backdrop-blur-[2px] lg:bg-gradient-to-r" />
           <div className="absolute bottom-6 left-6 right-6">
-            <h1 className="text-4xl font-bold md:text-5xl lg:text-6xl">
+            <p className="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-white/60">
+              Artist
+            </p>
+            <h1 className="display-title text-balance text-4xl font-semibold md:text-5xl lg:text-6xl">
               {artistName}
             </h1>
           </div>
         </aside>
 
         <section className="flex-1 px-4 py-8 lg:overflow-y-auto lg:px-10">
-          <h2 className="mb-6 text-sm font-medium uppercase tracking-widest text-zinc-500">
+          <h2 className="mb-6 font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted">
             专辑
           </h2>
 
@@ -88,7 +105,7 @@ export function ArtistPage({ artistId }: { artistId: string }) {
           )}
 
           {albumsQuery.isSuccess && albums.length === 0 && (
-            <p className="rounded-xl border border-white/10 bg-white/5 p-8 text-center text-zinc-400">
+            <p className="glass-panel rounded-2xl p-8 text-center text-sm text-muted shadow-soft">
               该艺人暂无正规专辑
             </p>
           )}
@@ -108,7 +125,7 @@ function AlbumRow({ album }: { album: ITunesResult }) {
   const id = album.collectionId!;
 
   return (
-    <li className="flex items-center gap-2 rounded-xl p-3 transition hover:bg-white/5">
+    <li className="group flex items-center gap-2 rounded-2xl p-3 transition-all hover:scale-[1.01] hover:bg-white/[0.04]">
       <Link
         href={`/album/${id}`}
         className="flex min-w-0 flex-1 items-center gap-4"
@@ -117,12 +134,14 @@ function AlbumRow({ album }: { album: ITunesResult }) {
           collectionId={id}
           src={album.artworkUrl100}
           alt={album.collectionName ?? ""}
-          className="h-20 w-20 shrink-0 rounded-md"
+          className="h-20 w-20 shrink-0 rounded-lg shadow-soft"
           size={80}
         />
         <div className="min-w-0 flex-1">
-          <p className="truncate font-medium">{album.collectionName}</p>
-          <p className="text-sm text-zinc-400">
+          <p className="truncate font-medium text-foreground">
+            {album.collectionName}
+          </p>
+          <p className="mt-0.5 text-sm text-muted">
             {releaseYear(album.releaseDate) ?? "—"} · {album.artistName}
           </p>
         </div>

@@ -44,7 +44,7 @@ function MarqueeStrip() {
 
   return (
     <div
-      className="overflow-hidden rounded-xl border border-white/25 bg-white/[0.03]"
+      className="glass-panel overflow-hidden rounded-2xl shadow-soft"
       aria-hidden
     >
       <div className="discovery-marquee-track flex w-max gap-8 md:gap-12">
@@ -65,17 +65,21 @@ export function DiscoveryFooter() {
   };
 
   return (
-    <footer className="mt-20">
+    <footer className="mt-24">
       <MarqueeStrip />
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-zinc-400">
-        <span>© 2026</span>
-        <span>Discurse</span>
+      <div className="hairline mt-6 flex flex-wrap items-center justify-between gap-3 pt-6 text-sm text-muted">
+        <span className="font-mono text-xs uppercase tracking-[0.2em]">
+          © 2026
+        </span>
+        <span className="font-mono text-xs uppercase tracking-[0.2em]">
+          Discurse
+        </span>
         <button
           type="button"
           onClick={scrollToTop}
-          className="transition hover:text-white"
+          className="transition-colors hover:text-foreground"
         >
-          Go all the way up
+          回到顶部
         </button>
       </div>
     </footer>

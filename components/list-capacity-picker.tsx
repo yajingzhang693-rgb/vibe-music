@@ -20,29 +20,32 @@ export function ListCapacityPicker({
 }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 backdrop-blur-sm sm:items-center"
       role="dialog"
       aria-modal
       aria-labelledby="capacity-picker-title"
       onClick={onCancel}
     >
       <div
-        className="w-full max-w-md rounded-2xl border border-white/30 bg-[#141414] p-5 shadow-2xl"
+        className="glass-panel w-full max-w-md rounded-2xl p-6 shadow-soft-lg"
         onClick={(e) => e.stopPropagation()}
       >
+        <p className="mb-1 text-center font-mono text-xs uppercase tracking-[0.2em] text-muted">
+          New List
+        </p>
         <h2
           id="capacity-picker-title"
-          className="mb-4 text-center text-lg font-semibold text-white"
+          className="mb-5 text-center text-lg font-semibold text-foreground"
         >
           {title}
         </h2>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2.5">
           {LIST_CAPACITIES.map((cap) => (
             <button
               key={cap}
               type="button"
               onClick={() => onSelect(cap)}
-              className="w-full rounded-full border border-white/30 bg-white/10 px-4 py-3.5 text-sm font-medium text-white transition hover:border-white/40 hover:bg-white/15"
+              className="w-full rounded-full border border-border bg-surface px-4 py-3.5 text-sm font-medium text-foreground transition-all hover:scale-[1.02] hover:border-white/25 hover:bg-surface-elevated active:scale-[0.98]"
             >
               {LABELS[cap]}
             </button>
@@ -52,7 +55,7 @@ export function ListCapacityPicker({
           <button
             type="button"
             onClick={onCancel}
-            className="mt-3 w-full py-2 text-sm text-zinc-500 transition hover:text-white"
+            className="mt-4 w-full py-2 text-sm text-muted transition-colors hover:text-foreground"
           >
             取消
           </button>
