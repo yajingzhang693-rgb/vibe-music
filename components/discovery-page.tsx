@@ -5,7 +5,6 @@ import { hdArtworkUrl } from "@/lib/artwork";
 import { lookupCollections, searchArtists } from "@/lib/itunes";
 import { useAlbumColors } from "@/hooks/use-album-colors";
 import type { ITunesResult } from "@/lib/types";
-import { AddToListButton } from "@/components/add-to-list-button";
 import { AlbumCover } from "@/components/album-cover";
 import { RetryBlock } from "@/components/ui/retry-block";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -127,36 +126,8 @@ export function DiscoveryPage({
         </div>
       </header>
 
-      {/* Hero：居中沉浸式 */}
-      <section className="relative mx-auto max-w-5xl px-4 pt-16 text-center md:px-8 md:pt-24">
-        {/* 渐变描边徽章 */}
-        <div className="mb-8 flex justify-center">
-          <Link
-            href="#featured"
-            className="group inline-flex items-center gap-2 rounded-full border border-border bg-white/[0.03] px-4 py-1.5 text-sm backdrop-blur-xl transition-colors hover:border-white/25"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-[#1db954]" />
-            <span className="text-muted">本周编辑精选已更新</span>
-            <span className="inline-flex items-center gap-1 font-medium text-foreground">
-              立即查看
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="transition-transform group-hover:translate-x-0.5"
-              >
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
-            </span>
-          </Link>
-        </div>
-
+      {/* Hero：居中沉浸式（标题 + 副标题 + 搜索） */}
+      <section className="relative mx-auto max-w-5xl px-4 pt-20 text-center md:px-8 md:pt-28">
         {/* 超大细体标题 */}
         <h1 className="display-title mx-auto max-w-3xl text-balance text-5xl font-medium md:text-7xl lg:text-[5.5rem]">
           为你聆听的一切
@@ -168,39 +139,8 @@ export function DiscoveryPage({
           为每一张打动你的专辑写下属于自己的评价。
         </p>
 
-        {/* 居中胶囊 CTA */}
-        <div className="mt-10 flex justify-center">
-          <Link
-            href="#featured"
-            className="group inline-flex items-center gap-3 rounded-full bg-foreground py-2 pl-6 pr-2 text-sm font-medium text-background shadow-soft-lg transition-transform hover:scale-[1.03] active:scale-95"
-          >
-            开始探索
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-background text-foreground">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="transition-transform group-hover:translate-x-0.5"
-              >
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
-            </span>
-          </Link>
-        </div>
-
-        {/* 漂浮交叠卡片排 + 彩色光束 */}
-        <HeroFloatingCards albums={heroCards} loading={showSkeleton} />
-      </section>
-
-      <div className="mx-auto max-w-6xl px-4 pb-16 md:px-8">
-        {/* 搜索 */}
-        <section id="search" className="mb-16 scroll-mt-24">
+        {/* 搜索（居中，紧随标题） */}
+        <div id="search" className="mx-auto mt-12 max-w-3xl scroll-mt-24 text-left">
           <div className="glass-panel flex items-center gap-2 rounded-full p-1.5 shadow-soft transition-colors focus-within:border-white/25">
             <span className="pl-4 text-muted" aria-hidden>
               <svg
@@ -284,32 +224,20 @@ export function DiscoveryPage({
               ))}
             </div>
           )}
-        </section>
+        </div>
+      </section>
 
-        {/* 编辑精选 */}
-        <section id="featured" className="scroll-mt-24">
-          <div className="mb-8 flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
-                编辑精选
-              </h2>
-              <p className="mt-1.5 text-sm text-muted">
-                由编辑团队挑选的当下值得反复聆听的专辑。
-              </p>
-            </div>
-            <span className="hidden shrink-0 font-mono text-xs uppercase tracking-[0.2em] text-muted md:inline">
-              Curated
-            </span>
-          </div>
+      {/* 编辑精选：居中标题 + 漂浮交叠卡片排 */}
+      <section
+        id="featured"
+        className="relative mx-auto max-w-6xl scroll-mt-24 px-4 pt-24 text-center md:px-8 md:pt-28"
+      >
+        <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+          编辑精选
+        </h2>
 
-          {showSkeleton && (
-            <div className="grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-6">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <Skeleton key={i} className="aspect-square w-full rounded-2xl" />
-              ))}
-            </div>
-          )}
-          {showError && (
+        {showError ? (
+          <div className="mx-auto mt-10 max-w-md">
             <RetryBlock
               message={
                 featured.error instanceof Error
@@ -318,33 +246,20 @@ export function DiscoveryPage({
               }
               onRetry={() => featured.refetch()}
             />
-          )}
-          {!showSkeleton && !showError && featuredAlbums.length === 0 && (
+          </div>
+        ) : !showSkeleton && featuredAlbums.length === 0 ? (
+          <div className="mx-auto mt-10 max-w-md">
             <RetryBlock
               message="精选专辑未加载，请检查网络或重启开发服务后重试"
               onRetry={() => featured.refetch()}
             />
-          )}
-          {featured.isSuccess &&
-            featuredAlbums.length > 0 &&
-            featuredAlbums.length < 8 && (
-              <p className="mb-4 text-sm text-amber-400/90">
-                部分精选专辑暂时无法加载（{featuredAlbums.length}/8）
-              </p>
-            )}
-          {featuredAlbums.length > 0 && (
-            <div className="grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-6">
-              {featuredAlbums.map((album, i) => (
-                <FeaturedCard
-                  key={album.collectionId}
-                  album={album}
-                  index={i}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+          </div>
+        ) : (
+          <HeroFloatingCards albums={heroCards} loading={showSkeleton} />
+        )}
+      </section>
 
+      <div className="mx-auto max-w-6xl px-4 pb-16 md:px-8">
         <DiscoveryFooter />
       </div>
     </main>
@@ -515,89 +430,5 @@ function LightStreaks() {
         />
       ))}
     </div>
-  );
-}
-
-function FeaturedCard({ album, index }: { album: ITunesResult; index: number }) {
-  const id = album.collectionId!;
-  const [hover, setHover] = useState(false);
-  const artwork = hdArtworkUrl(album.artworkUrl100);
-  const { color } = useAlbumColors(artwork);
-
-  return (
-    <motion.div
-      className="group relative"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.5,
-        delay: Math.min(index * 0.05, 0.4),
-        ease: [0.22, 1, 0.36, 1],
-      }}
-    >
-      <AddToListButton
-        collectionId={id}
-        size="sm"
-        className="absolute right-2.5 top-2.5 z-30 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-      />
-      <Link
-        href={`/album/${id}`}
-        className="relative block aspect-square w-full rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-      >
-        {/* 封面主色光晕（悬停加强） */}
-        <motion.div
-          className="pointer-events-none absolute -inset-2 rounded-[1.4rem]"
-          initial={false}
-          animate={{
-            opacity: hover ? 0.9 : 0,
-            scale: hover ? 1.06 : 0.95,
-          }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            background: `radial-gradient(ellipse 75% 65% at 50% 55%, ${color}55 0%, transparent 70%)`,
-            filter: "blur(22px)",
-          }}
-          aria-hidden
-        />
-        <motion.div
-          className="relative h-full w-full overflow-hidden rounded-2xl border border-border bg-white/[0.04]"
-          initial={false}
-          animate={{
-            scale: hover ? 1.025 : 1,
-            boxShadow: hover
-              ? `0 18px 50px -12px ${color}66, 0 0 0 1px rgba(255,255,255,0.12) inset`
-              : `0 8px 30px -16px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04) inset`,
-          }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <motion.div
-            className="h-full w-full origin-center"
-            initial={false}
-            animate={{ scale: hover ? 1.06 : 1 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <AlbumCover
-              collectionId={id}
-              src={album.artworkUrl100}
-              alt={album.collectionName ?? "Album"}
-              fillContainer
-            />
-          </motion.div>
-          <motion.div
-            initial={false}
-            animate={{ opacity: hover ? 1 : 0 }}
-            transition={{ duration: 0.25 }}
-            className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/90 via-black/35 to-transparent p-4"
-          >
-            <p className="text-sm font-semibold leading-tight text-white">
-              {album.collectionName}
-            </p>
-            <p className="mt-0.5 text-xs text-white/60">{album.artistName}</p>
-          </motion.div>
-        </motion.div>
-      </Link>
-    </motion.div>
   );
 }
