@@ -185,37 +185,41 @@ supabase/
 
 **顶栏**
 
-- 主标题 **Discurse**（48px / `text-5xl`），与右侧「我的榜单」按钮 **垂直居中对齐**。
-- 副标题「发现 · 评分 · 分享」置于标题下方（白色）。
-- 「我的榜单」链至 `/lists`。
+- 居中毛玻璃胶囊导航条（`glass-panel`）：左侧品牌 **Discurse**（带音符图标），中部「发现 / 精选 / 搜索」当前项白底高亮，右侧「我的榜单」白色胶囊按钮链至 `/lists`。
+
+**Hero**
+
+- 超大细体标题（`display-title`，桌面约 `text-[5.5rem]`），两行：首行白色、次行 `text-muted`。
+- 副标题为 `max-w-xl` 居中 `text-muted` 段落。
 
 **搜索**
 
-- 圆角胶囊搜索条 + 右侧圆形搜索按钮；Enter 或点击搜索展示艺人列表并跳转艺人页。
+- 居中窄搜索框（`max-w-sm`）：`glass-panel` 全圆角胶囊 + 放大镜图标 + 右侧白色「搜索」胶囊；`focus-within` 时边框提亮。Enter 或点击搜索展示艺人列表并跳转艺人页。
 
 **编辑精选**
 
-- **8 张**固定精选专辑（`FEATURED_COLLECTION_IDS`）。
-- 网格：默认 2 列，≥768px 为 4 列；封面 `rounded-xl`，hover 主题色光晕与轻微放大。
-- 封面右上角 **「+」** 可加入榜单；hover 显示专辑名与艺人。
+- 居中标题「编辑精选」，下方为 **5 张专辑封面卡片呈扇形交叠**排列（中间最大最靠前，向两侧依次缩小、旋转、降低层级与透明度）。
+- 卡片为竖向矩形（桌面约 262×345px，`rounded-2xl`），顶部 **VIBE** 小标签，底部黑色渐变条压住专辑名与艺人名；中间主卡 hover 触发封面主色径向光晕 + 缩放。
+- 卡片排下方有数道缓慢飘动的彩色光束氛围效果。
 
 **底部页脚**（[`discovery-footer.tsx`](components/discovery-footer.tsx)）
 
-- **TASTE, ARCHIVED** 横向无限滚动横幅：`rounded-xl` 描边框，文案 + 白底箭头圆标重复排列；字号 `text-xl` / `md:text-2xl`，常规字重。
+- **TASTE, ARCHIVED** 横向无限滚动横幅：文案 + 白底箭头圆标重复排列。
 - 双段 `ul` 无缝循环（`globals.css` 中 `discovery-marquee`，约 28s；`prefers-reduced-motion` 时停止动画）。
-- 页脚一行：© 2026 · Discurse · **Go all the way up**（平滑滚回顶部）。
+- 页脚 `hairline` 分隔线上方一行：© 2026 · Discurse · **回到顶部**（平滑滚回顶部）。
 
 ### 艺人页（`/artist/[artistId]`）
 
-- 仅 `collection` + `Album`，且 `trackCount > 7`（排除 EP）。
-- 按规范化标题去重 Deluxe / Expanded 等变体。
+- 左右分栏：左侧大幅艺人背景图 + 底部 `display-title` 大名字与 `font-mono` 的 **ARTIST** 小标签；右侧专辑列表。
+- 左上角 `fixed` 定位的毛玻璃返回胶囊（滚动列表时保持固定可见）。
+- 专辑过滤：仅 `collection` + `Album`，且 `trackCount > 7`（排除 EP）；按规范化标题去重 Deluxe / Expanded 等变体；列表行 hover 微缩放。
 
 ### 打分页（`/album/[collectionId]`）
 
-- 左：分享卡预览（450px 宽）+「下载分享卡片」；右：评分、乐评、曲目列表。
+- 左：分享卡预览（450px 宽）+「下载分享卡片」；右：评分、乐评、曲目列表，均为 `glass-panel` 卡片 + `font-mono` 小标签。
 - 总分 = `整体 × 0.7 + ((制作 + 词曲) / 2) × 0.3`；乐评最多 **300 字**。
 - 加载时从 Supabase 读取；无记录时分数初始为 0。
-- 显式「保存评分 / 更新评分」按钮，保存成功后 Toast 提示。
+- 显式「保存评分 / 更新评分」主按钮（`bg-foreground`），保存成功后 Toast 提示。
 
 ### AI 聊天助理
 
@@ -227,9 +231,10 @@ supabase/
 
 ### 我的榜单（`/lists`）
 
-- 新建时选择容量 **10张 / 20张 / 30张**（创建后不可改）。
-- 列表左侧 **封面堆叠**（前 3 张专辑；无专辑时音乐图标占位）。
-- 副文案 `n / 容量 张专辑 · x 张榜`（12px / `text-xs`）。
+- `display-title` 标题 + `font-mono` 的 **COLLECTIONS** 小标签；新建按钮为白底主按钮。
+- 新建时弹出毛玻璃容量选择弹窗，选择 **10张 / 20张 / 30张**（创建后不可改）。
+- 榜单条目为 `glass-panel` 卡片（hover 微缩放），左侧 **封面堆叠**（前 3 张专辑；无专辑时音乐图标占位）。
+- 副文案 `n / 容量 张专辑 · x 张榜`（`text-xs text-muted`）。
 - 行内重命名；hover 编辑 / 删除（删除带滑出动画）。
 
 ### 榜单编辑（`/lists/[listId]`）
@@ -294,7 +299,9 @@ git push
 | 位置 | 文案 |
 | --- | --- |
 | 发现页顶栏 | **Discurse** |
-| 发现页 Marquee / 页脚中栏 | TASTE, ARCHIVED / **Discurse** |
+| 发现页 Marquee | TASTE, ARCHIVED |
+| 发现页页脚中栏 | **Discurse**（右栏为「回到顶部」） |
+| 专辑封面卡标签 | **VIBE** |
 | 浏览器标签（`layout.tsx`） | Vibe Music Rating |
 | 专辑 / 榜单分享卡底栏 | Vibe Music Rating |
 
@@ -302,10 +309,38 @@ git push
 
 ## UI 规范（全站深色）
 
-- 页面背景 `#0a0a0a`，正文 `#ededed`。
-- 字体：系统 UI 栈（`system-ui`, Segoe UI 等），无额外 Web Font。
-- 毛玻璃按钮：`bg-white/10` + `border-white/30` + `backdrop-blur-xl`。
-- 分享卡 / 列表卡片描边多为 `border-white/30`。
+全站采用统一的设计系统（定义于 [`globals.css`](app/globals.css) `:root` 与 [`tailwind.config.ts`](tailwind.config.ts)），发现页 / 艺人页 / 打分页 / 我的榜单视觉语言一致。
+
+**设计 Token（CSS 变量 → Tailwind 语义色）**
+
+| Token | 值 | Tailwind 类 |
+| --- | --- | --- |
+| `--background` | `#0a0a0a` | `bg-background` |
+| `--foreground` | `#ededed` | `text-foreground` |
+| `--muted` | `#8a8a8f` | `text-muted` |
+| `--surface` | `rgba(255,255,255,0.04)` | `bg-surface` |
+| `--surface-elevated` | `rgba(255,255,255,0.06)` | `bg-surface-elevated` |
+| `--border` | `rgba(255,255,255,0.1)` | `border-border` |
+| `--radius` | `0.875rem` | `rounded-lg/xl/2xl` |
+| `--album-theme-color` | 封面主色（动态） | 滑块 / hover 光晕 |
+
+**字体**
+
+- 正文与标题统一使用 **Geist Sans**（`geist/font/sans`，挂到 `font-sans`）。
+- 标签、年份、版权等小字用 **Geist Mono**（`geist/font/mono`，挂到 `font-mono`），常配 `uppercase tracking-[0.2em]`。
+
+**通用工具类**（`globals.css`）
+
+- `.glass-panel`：毛玻璃面板基底（`--surface` 背景 + `--border` 描边 + `backdrop-blur(20px)`）。
+- `.display-title`：大标题紧凑字距（`letter-spacing:-0.03em; line-height:0.95`）。
+- `.hairline`：极细顶部分隔线 + 微高光（用于页脚版权行）。
+- `shadow-soft` / `shadow-soft-lg`：柔和投影（含内高光），见 `tailwind.config.ts`。
+
+**按钮 / 卡片范式**
+
+- 主按钮（保存评分、新建榜单）：`bg-foreground text-background rounded-full` + `shadow-soft-lg`，hover 微缩放。
+- 次级 / 返回按钮：`glass-panel rounded-full`，带返回箭头图标，hover `scale-[1.03]` + `border-white/25`。
+- 卡片：`glass-panel rounded-2xl shadow-soft`，列表行 hover `scale-[1.01]`。
 
 ---
 
