@@ -21,8 +21,22 @@ function BackLink() {
   return (
     <Link
       href="/"
-      className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition hover:border-white/40 hover:bg-white/15"
+      className="glass-panel inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-foreground shadow-soft transition-all hover:scale-[1.03] hover:border-white/25 active:scale-95"
     >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="15"
+        height="15"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+      >
+        <path d="m15 18-6-6 6-6" />
+      </svg>
       返回
     </Link>
   );
@@ -82,8 +96,8 @@ function ListCoverStack({
         className="relative h-12 w-20 shrink-0"
         aria-label="暂无专辑封面"
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-md border border-dashed border-white/25 bg-white/5">
-          <MusicIcon className="h-5 w-5 text-white/25" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-md border border-dashed border-border bg-surface">
+          <MusicIcon className="h-5 w-5 text-muted" />
         </div>
       </div>
     );
@@ -98,7 +112,7 @@ function ListCoverStack({
         return (
           <div
             key={id}
-            className={`absolute overflow-hidden rounded-md border border-white/20 bg-zinc-800 shadow-md ${offset}`}
+            className={`absolute overflow-hidden rounded-md border border-border bg-zinc-800 shadow-soft ${offset}`}
             style={{ width: 48, height: 48 }}
           >
             {url ? (
@@ -213,27 +227,40 @@ export function ListsPage() {
   );
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white">
+    <main className="min-h-screen bg-[#0a0a0a] text-foreground">
       <div className="mx-auto max-w-2xl px-6 py-10">
-        <div className="mb-8 flex items-center justify-between gap-4">
+        <div className="mb-10 flex items-center justify-between gap-4">
           <BackLink />
-          <h1 className="text-2xl font-bold">我的榜单</h1>
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+            Collections
+          </span>
         </div>
+
+        <header className="mb-8">
+          <h1 className="display-title text-balance text-4xl font-semibold md:text-5xl">
+            我的榜单
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-muted">
+            把打动你的专辑编排成属于自己的榜单，随时回顾与分享。
+          </p>
+        </header>
 
         <div className="mb-8">
           <button
             type="button"
             onClick={() => setShowCapacityPicker(true)}
-            className="w-full rounded-full border border-white/30 bg-white/10 px-4 py-3.5 text-sm font-medium text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] backdrop-blur-xl transition hover:border-white/40 hover:bg-white/15"
+            className="w-full rounded-full bg-foreground px-4 py-3.5 text-sm font-medium text-background shadow-soft-lg transition-transform hover:scale-[1.01] active:scale-[0.99]"
           >
             新建我的榜单
           </button>
         </div>
 
         {lists.length === 0 ? (
-          <p className="text-center text-sm text-zinc-500">
-            还没有榜单，点击上方按钮开始创作
-          </p>
+          <div className="glass-panel mt-4 rounded-2xl px-6 py-14 text-center shadow-soft">
+            <p className="text-sm text-muted">
+              还没有榜单，点击上方按钮开始创作
+            </p>
+          </div>
         ) : (
           <ul className="space-y-3 overflow-x-visible">
             <AnimatePresence initial={false} mode="popLayout">
@@ -245,7 +272,7 @@ export function ListsPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 120 }}
                   transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-                  className="group flex items-center gap-4 rounded-xl border border-white/30 bg-white/5 px-4 py-5 backdrop-blur-md transition hover:border-white/40 hover:bg-white/[0.07]"
+                  className="group flex items-center gap-4 rounded-2xl glass-panel px-4 py-5 shadow-soft transition-all hover:scale-[1.01] hover:border-white/20"
                 >
                 <ListCoverStack
                   albumIds={list.albumIds}
@@ -270,7 +297,7 @@ export function ListsPage() {
                       }}
                       autoFocus
                       aria-label="榜单名称"
-                      className="w-full rounded-lg border border-white/30 bg-white/10 px-2 py-1 font-medium text-white outline-none focus:border-white/40"
+                      className="w-full rounded-lg glass-panel px-2 py-1 font-medium text-foreground outline-none focus:border-white/25"
                     />
                   ) : (
                     <Link
@@ -278,17 +305,17 @@ export function ListsPage() {
                       className="block hover:opacity-90"
                     >
                       <p className="truncate font-medium">{list.title}</p>
-                      <p className="mt-0.5 text-xs text-zinc-400">
+                      <p className="mt-0.5 text-xs text-muted">
                         {list.albumIds.length} / {list.capacity} 张专辑
-                        <span className="text-zinc-600"> · </span>
+                        <span className="text-muted/50"> · </span>
                         {list.capacity} 张榜
                       </p>
                     </Link>
                   )}
                   {editingId === list.id && (
-                    <p className="mt-0.5 text-xs text-zinc-400">
+                    <p className="mt-0.5 text-xs text-muted">
                       {list.albumIds.length} / {list.capacity} 张专辑
-                      <span className="text-zinc-600"> · </span>
+                      <span className="text-muted/50"> · </span>
                       {list.capacity} 张榜
                     </p>
                   )}
@@ -306,7 +333,7 @@ export function ListsPage() {
                     onClick={() => startRename(list)}
                     aria-label="编辑"
                     title="重命名"
-                    className="rounded-lg p-2 text-zinc-500 transition hover:bg-white/10 hover:text-white"
+                    className="rounded-lg p-2 text-muted transition-colors hover:bg-white/[0.06] hover:text-foreground"
                   >
                     <EditIcon className="h-[18px] w-[18px]" />
                   </button>
@@ -315,7 +342,7 @@ export function ListsPage() {
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => handleDelete(list)}
                     aria-label="删除"
-                    className="rounded-lg p-2 text-zinc-500 transition hover:bg-white/10 hover:text-red-300"
+                    className="rounded-lg p-2 text-muted transition-colors hover:bg-white/[0.06] hover:text-red-300"
                   >
                     <TrashIcon className="h-[18px] w-[18px]" />
                   </button>
