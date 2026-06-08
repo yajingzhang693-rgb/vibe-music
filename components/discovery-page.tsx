@@ -283,7 +283,7 @@ function HeroFloatingCards({
   ];
 
   return (
-    <div className="relative mt-[22px] h-[300px] md:h-[380px]">
+    <div className="relative mt-[22px] h-[360px] md:h-[460px]">
       {/* 彩色光束 */}
       <LightStreaks />
 
@@ -320,7 +320,7 @@ function HeroFloatingCards({
                 {album ? (
                   <HeroCard album={album} dim={cfg.blur} />
                 ) : (
-                  <div className="h-[220px] w-[170px] rounded-2xl border border-border bg-white/[0.04] md:h-[280px] md:w-[210px]" />
+                  <div className="h-[270px] w-[205px] rounded-2xl border border-border bg-white/[0.04] md:h-[345px] md:w-[262px]" />
                 )}
               </motion.div>
             );
@@ -338,7 +338,7 @@ function HeroCard({ album, dim }: { album: ITunesResult; dim: boolean }) {
   return (
     <Link
       href={`/album/${id}`}
-      className="group relative block h-[220px] w-[170px] md:h-[280px] md:w-[210px]"
+      className="group relative block h-[270px] w-[205px] md:h-[345px] md:w-[262px]"
     >
       {/* 主色光晕 */}
       <div
