@@ -35,7 +35,7 @@ export function ArtistPage({ artistId }: { artistId: string }) {
     <main className="relative min-h-screen bg-[#0a0a0a] text-foreground">
       <Link
         href="/"
-        className="glass-panel absolute left-4 top-8 z-20 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-foreground shadow-soft transition-all hover:scale-[1.03] hover:border-white/25 active:scale-95 lg:left-6"
+        className="glass-panel fixed left-4 top-8 z-20 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-foreground shadow-soft transition-all hover:scale-[1.03] hover:border-white/25 active:scale-95 lg:left-6"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
