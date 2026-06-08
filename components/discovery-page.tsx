@@ -230,7 +230,7 @@ export function DiscoveryPage({
       {/* 编辑精选：居中标题 + 漂浮交叠卡片排 */}
       <section
         id="featured"
-        className="relative mx-auto max-w-6xl scroll-mt-24 px-4 pt-48 text-center md:px-8 md:pt-64"
+        className="relative mx-auto max-w-6xl scroll-mt-24 px-4 pt-48 text-center md:px-8 md:pt-[110px]"
       >
         <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
           编辑精选
