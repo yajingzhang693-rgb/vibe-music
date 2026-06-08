@@ -20,7 +20,6 @@ const NAV_ITEMS = [
   { label: "发现", href: "#top", active: true },
   { label: "精选", href: "#featured", active: false },
   { label: "搜索", href: "#search", active: false },
-  { label: "榜单", href: "/lists", active: false },
 ] as const;
 
 export function DiscoveryPage({
