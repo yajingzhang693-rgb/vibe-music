@@ -139,7 +139,7 @@ export function DiscoveryPage({
         </p>
 
         {/* 搜索（居中，紧随标题） */}
-        <div id="search" className="mx-auto mt-12 max-w-3xl scroll-mt-24 text-left">
+        <div id="search" className="mx-auto mt-12 max-w-xl scroll-mt-24 text-left">
           <div className="glass-panel flex items-center gap-2 rounded-full p-1.5 shadow-soft transition-colors focus-within:border-white/25">
             <span className="pl-4 text-muted" aria-hidden>
               <svg
