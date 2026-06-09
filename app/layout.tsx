@@ -7,6 +7,7 @@ import { AiAssistant } from "@/components/ai-assistant";
 import { ListsHydrator } from "@/components/providers/lists-hydrator";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { MotionProvider } from "@/components/providers/motion-provider";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Vibe Music Rating",
@@ -35,6 +36,7 @@ export default function RootLayout({
             <AiAssistant />
           </MotionProvider>
         </QueryProvider>
+        <Analytics />
       </body>
     </html>
   );
