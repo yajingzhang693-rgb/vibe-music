@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone'，
+  output: 'standalone',
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "is1-ssl.mzstatic.com" },
@@ -10,6 +10,6 @@ const nextConfig = {
       { protocol: "https", hostname: "is5-ssl.mzstatic.com" },
     ],
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig
