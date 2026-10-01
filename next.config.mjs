@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
-  trailingSlash: true,
+  trailingSlash: false,
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "is1-ssl.mzstatic.com" },
